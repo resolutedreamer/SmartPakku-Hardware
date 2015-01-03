@@ -126,7 +126,9 @@ void loop()
 
 		nrf->sendData(PIPE_HEART_RATE_HEART_RATE_MEASUREMENT_TX, 2, (uint8_t *)&temp);
 		lastSent = millis();
-		uint8_t bat = 78;
+		
+		// For LiPo Fuel Gauge
+		uint8_t bat = batteryMonitor.getSoC();		
 
 		// If battery pipe is open
 		if (nrf->isPipeOpen(PIPE_BATTERY_BATTERY_LEVEL_TX) && nrf->creditsAvailable())
