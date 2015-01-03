@@ -7,6 +7,10 @@
 
 #include "services.h"
 
+// For LiPo Fuel Gauge
+#include "MAX17043.h"
+#include "Wire.h"
+
 hal_aci_data_t setup_msgs[NB_SETUP_MESSAGES] = SETUP_MESSAGES_CONTENT;
 
 // change nRF8001 reset pin to -1 if it's not connected
@@ -21,6 +25,10 @@ nRF8001 *nrf;
 float temperatureC;
 uint8_t pipeStatusReceived, dataSent;
 unsigned long lastSent;
+
+// For LiPo Fuel Gauge
+MAX17043 batteryMonitor;
+
 
 // This function is called when nRF8001 responds with the temperature
 void temperatureHandler(float tempC)
@@ -42,8 +50,31 @@ void setup()
 	pipeStatusReceived = 0;
 	lastSent = 0;
 
+	Wire.begin();
 	Serial.begin(115200);
 	Serial.println("Hello");
+	
+	// LiPo Fuel Gauge Init Code
+	
+	Serial.println("MAX17043 Example: reading voltage and SoC");
+	Serial.println();
+
+	batteryMonitor.reset();
+	batteryMonitor.quickStart();
+	delay(1000);
+
+	float cellVoltage = batteryMonitor.getVCell();
+	Serial.print("Voltage:\t\t");
+	Serial.print(cellVoltage, 4);
+	Serial.println("V");
+
+	float stateOfCharge = batteryMonitor.getSoC();
+	Serial.print("State of charge:\t");
+	Serial.print(stateOfCharge);
+	Serial.println("%");
+
+	// // LiPo Fuel Gauge Init Code End
+	
 
 	// nRF8001 class initialized with pin numbers
 	nrf = new nRF8001(RESET_PIN, REQN_PIN, RDYN_PIN);
