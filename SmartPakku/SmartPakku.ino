@@ -12,9 +12,9 @@ hal_aci_data_t setup_msgs[NB_SETUP_MESSAGES] = SETUP_MESSAGES_CONTENT;
 // change nRF8001 reset pin to -1 if it's not connected
 // Redbear BLE Shield users: to my knowledge reset pin is not connected so use -1!
 // NOTE: if you choose -1, youll need to manually reset your device after powerup!!
-#define RESET_PIN 7
-#define REQN_PIN 9
-#define RDYN_PIN 8
+#define RESET_PIN 9
+#define REQN_PIN 10
+#define RDYN_PIN 2
 
 nRF8001 *nrf;
 
