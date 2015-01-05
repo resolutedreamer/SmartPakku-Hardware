@@ -187,7 +187,10 @@ void loop()
 		Serial.println("ready to send data");
 		uint8_t temp[2];
 		temp[0] = 0;
-		temp[1] = round(temperatureC);
+		//temp[1] = round(temperatureC);
+		
+		// For determing backpack state  
+		temp[1] = get_state();
 		
 		nrf->sendData(PIPE_HEART_RATE_HEART_RATE_MEASUREMENT_TX, 2, (uint8_t *)&temp);
 		lastSent = millis();
