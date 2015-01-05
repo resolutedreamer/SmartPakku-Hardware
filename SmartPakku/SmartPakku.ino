@@ -29,6 +29,71 @@ unsigned long lastSent;
 // For LiPo Fuel Gauge
 MAX17043 batteryMonitor;
 
+// For FSR
+
+// each of a0 - a3 have a FSR and 10K pulldown resistor attached 
+const int fsrPin0 = 0;
+const int fsrPin1 = 1;
+const int fsrPin2 = 2;
+const int fsrPin3 = 3;     
+
+// store readings for each of the pins
+int fsrRawData0;
+int fsrRawData1;
+int fsrRawData2;
+int fsrRawData3;
+
+// store state of 4 4 resistors
+uint8_t state;
+
+void get_FSR_values()
+{
+	fsrRawData0 = analogRead(fsrPin0);  
+	fsrRawData1 = analogRead(fsrPin1);
+	fsrRawData2 = analogRead(fsrPin2);
+	fsrRawData3 = analogRead(fsrPin3);
+}
+
+bool fsr_pressed(int fsrRawData)
+{
+	if (fsrRawData > 800)
+	{
+		return true;
+	}
+	else
+        {
+        	return false;
+        }
+}
+
+uint8_t get_state()
+{
+	state = 0;
+	bool fsr0pressed, fsr1pressed, fsr2pressed, fsr3pressed;
+	get_FSR_values();
+	fsr0pressed = fsr_pressed(fsrRawData0);
+	fsr1pressed = fsr_pressed(fsrRawData1);
+	fsr2pressed = fsr_pressed(fsrRawData2);
+	fsr3pressed = fsr_pressed(fsrRawData3);
+	if (fsr0pressed)
+	{
+		state = state | 1;
+	}
+	if (fsr1pressed)
+	{
+		state = state | 2;
+	}
+	if (fsr2pressed)
+	{
+		state = state | 4;
+	}
+	if (fsr3pressed)
+	{
+		state = state | 8;
+	}
+	return state;
+}
+
 
 // This function is called when nRF8001 responds with the temperature
 void temperatureHandler(float tempC)
@@ -123,7 +188,7 @@ void loop()
 		uint8_t temp[2];
 		temp[0] = 0;
 		temp[1] = round(temperatureC);
-
+		
 		nrf->sendData(PIPE_HEART_RATE_HEART_RATE_MEASUREMENT_TX, 2, (uint8_t *)&temp);
 		lastSent = millis();
 		
