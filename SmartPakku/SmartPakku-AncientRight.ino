@@ -54,7 +54,7 @@ long measure_force(int fsrPin)
 	unsigned long fsrConductance; 
 	long fsrForce;       // Finally, the resistance converted to force
 
-	fsrReading = analogRead(fsrPin);  
+	fsrReading = analogRead(fsrPin);
 
 	fsrVoltage = map(fsrReading, 0, 1023, 0, 5000);
 	if (fsrVoltage == 0)
@@ -159,6 +159,7 @@ void setup()
 	temperatureC = 0.0;
 	pipeStatusReceived = 0;
 	lastSent = 0;
+	bt_transfer_seq = 0;
 
 	Wire.begin();
 	Serial.begin(115200);
@@ -255,14 +256,22 @@ void loop()
 		temp[0] = 0;
 		//temp[1] = round(temperatureC);
 		
-		// The data that should be sent will depend on what stage of sending we are at  
-		
-		
+		// The data that should be sent will depend on what stage of sending we are at
 		temp[1] = assign_value();
-		
-		
-		
-		
+		if (bt_transfer_seq <= 6)
+		{
+			bt_transfer_seq += 1;
+		}
+		else
+		{
+			bt_transfer_seq = 0;
+		}
+		//
+		Serial.print("We are in bt_transfer_seq stage: ");
+		Serial.print(bt_transfer_seq);
+		//
+		Serial.print("The value we are sending is: ");
+		Serial.print(temp[1]);
 		
 		nrf->sendData(PIPE_HEART_RATE_HEART_RATE_MEASUREMENT_TX, 2, (uint8_t *)&temp);
 		lastSent = millis();
