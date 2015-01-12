@@ -20,6 +20,13 @@ hal_aci_data_t setup_msgs[NB_SETUP_MESSAGES] = SETUP_MESSAGES_CONTENT;
 #define REQN_PIN 10
 #define RDYN_PIN 2
 
+// For FSR
+// each of a0 - a3 have a FSR and 10K pulldown resistor attached 
+#define fsrPin0 0
+#define fsrPin1 1
+#define fsrPin2 2
+#define fsrPin3 3
+
 nRF8001 *nrf;
 
 float temperatureC;
@@ -29,23 +36,6 @@ unsigned long lastSent;
 // For LiPo Fuel Gauge
 MAX17043 batteryMonitor;
 
-// For FSR
-
-// each of a0 - a3 have a FSR and 10K pulldown resistor attached 
-const int fsrPin0 = 0;
-const int fsrPin1 = 1;
-const int fsrPin2 = 2;
-const int fsrPin3 = 3;
-
-// store state of 4 FSRs
-uint8_t state;
-
-// store forces
-long fsrForces[4];
-
-// what data to send
-int bt_transfer_seq;
-
 long measure_force(int fsrPin)
 {
 	int fsrReading;     // the analog reading from the FSR resistor divider
@@ -54,7 +44,7 @@ long measure_force(int fsrPin)
 	unsigned long fsrConductance; 
 	long fsrForce;       // Finally, the resistance converted to force
 
-	fsrReading = analogRead(fsrPin);  
+	fsrReading = analogRead(fsrPin);
 
 	fsrVoltage = map(fsrReading, 0, 1023, 0, 5000);
 	if (fsrVoltage == 0)
@@ -84,7 +74,7 @@ long measure_force(int fsrPin)
 	return fsrForce;
 }
 
-void process_forces()
+void process_forces(long fsrForces[])
 {
 	fsrForces[0] = measure_force(fsrPin0);
 	fsrForces[1] = measure_force(fsrPin1);
@@ -104,34 +94,35 @@ bool fsr_pressed(long fsrForce)
 	}
 }
 
-uint8_t get_pressed_state()
+uint8_t get_pressed_state(long fsrForces[])
 {
-	state = 0;
-	bool fsrPressed[4];
+	uint8_t state = 0;
+	bool fsrPressed0, fsrPressed1, fsrPressed2, fsrPressed3;
+
+	// store forces
+	process_forces(fsrForces);
 	
-	process_forces();
+	fsrPressed0 = fsr_pressed(fsrForces[0]);
+	fsrPressed1 = fsr_pressed(fsrForces[1]);
+	fsrPressed2 = fsr_pressed(fsrForces[2]);
+	fsrPressed3 = fsr_pressed(fsrForces[3]);
 	
-	fsrPressed[0] = fsr_pressed(fsrForces[0]);
-	fsrPressed[1] = fsr_pressed(fsrForces[1]);
-	fsrPressed[2] = fsr_pressed(fsrForces[2]);
-	fsrPressed[3] = fsr_pressed(fsrForces[3]);
-	
-	if (fsrPressed[0])
+	if (fsrPressed0)
 	{
 		state = state | 1;
 		
 	}
-	if (fsrPressed[1])
+	if (fsrPressed1)
 	{
 		state = state | 2;
 		
 	}
-	if (fsrPressed[2])
+	if (fsrPressed2)
 	{
 		state = state | 4;
 		
 	}
-	if (fsrPressed[3])
+	if (fsrPressed3)
 	{
 		state = state | 8;
 		
@@ -139,18 +130,71 @@ uint8_t get_pressed_state()
 	return state;
 }
 
+uint8_t assign_value(int bt_transfer_seq, long fsrForces[])
+{
+	uint8_t a_state;
+	uint8_t a_force;
+	String sending = "Sending: ";
+	String sending_weight = "We send a weight in Newtons";
+			
+
+	Serial.print("We are in bt_transfer_seq stage: ");
+	Serial.println(bt_transfer_seq);
+	switch(bt_transfer_seq)
+	{
+		case 0:
+			Serial.println("Send an 's'");			
+			Serial.print(sending);
+			Serial.println("s");		
+			return 's';
+		case 1:
+			a_state = get_pressed_state(fsrForces);
+			Serial.println("We send the current backpack state.");			
+			Serial.print(sending);
+			Serial.println(a_state);		
+			return a_state;
+		case 2:
+			a_force = fsrForces[0];
+			Serial.println(sending_weight);			
+			Serial.print(sending);
+			Serial.println(a_force);		
+			return a_force;
+		case 3:
+			a_force = fsrForces[1];
+			Serial.println(sending_weight);			
+			Serial.print(sending);
+			Serial.println(a_force);		
+			return a_force;
+		case 4:
+			a_force = fsrForces[2];
+			Serial.println(sending_weight);			
+			Serial.print(sending);
+			Serial.println(a_force);		
+			return a_force;
+		case 5:
+			a_force = fsrForces[3];
+			Serial.println(sending_weight);			
+			Serial.print(sending);
+			Serial.println(a_force);		
+			return a_force;
+		default:
+			Serial.println("FAILURE");
+			return 0;
+	}
+}
+
 
 // This function is called when nRF8001 responds with the temperature
 void temperatureHandler(float tempC)
 {
-	Serial.println("received temperature");
+	//Serial.println("received temperature");
 	temperatureC = tempC;
 }
 
 // Generic event handler, here it's just for debugging all received events
 void eventHandler(nRFEvent *event)
 {
-	Serial.println("event handler");
+	//Serial.println("event handler");
 	nrf->debugEvent(event);
 }
 
@@ -162,11 +206,11 @@ void setup()
 
 	Wire.begin();
 	Serial.begin(115200);
-	Serial.println("Hello");
+	//Serial.println("Hello");
 	
 	// LiPo Fuel Gauge Init Code
 	
-	Serial.println("MAX17043 Example: reading voltage and SoC");
+	//Serial.println("MAX17043 Example: reading voltage and SoC");
 	Serial.println();
 
 	batteryMonitor.reset();
@@ -219,50 +263,44 @@ void setup()
 	nrf->connect(0, 32);
 }
 
-uint8_t assign_value()
-{
-	switch(bt_transfer_seq)
-	{
-		case 1:
-		   return 's';
-		case 2:
-		   return get_pressed_state();
-		case 3:
-		   return fsrForces[0];
-		case 4:
-		   return fsrForces[1];
-		case 5:
-		   return fsrForces[2];
-		case 6:
-		   return fsrForces[3];
-		default:
-		   return 0;
-	}
-}
-
 void loop()
 {
-	Serial.println("polling");
+	// what data to send
+	int bt_transfer_seq = 0;
+	long fsrForces[4];
+	Serial.println("Looping");
 
 	// Polling will block - times out after 2 seconds
 	nrf->poll(2000);
 
+	bool a = nrf->isPipeOpen(PIPE_HEART_RATE_HEART_RATE_MEASUREMENT_TX);
+	bool b = (millis() - lastSent) > 1000;
+	bool c = temperatureC > 0.0 && nrf->creditsAvailable();
+	
+	Serial.println(a);
+	Serial.println(b);
+	Serial.println(c);
+	Serial.println();
+	
+	
 	// If heart rate pipe is open
-	if (nrf->isPipeOpen(PIPE_HEART_RATE_HEART_RATE_MEASUREMENT_TX) && (millis() - lastSent) > 1000 && temperatureC > 0.0 && nrf->creditsAvailable())
+	if ( a && b && c)
 	{
-		Serial.println("ready to send data");
+		Serial.println("Preparing to send");
 		uint8_t temp[2];
 		temp[0] = 0;
 		//temp[1] = round(temperatureC);
 		
-		// The data that should be sent will depend on what stage of sending we are at  
-		
-		
-		temp[1] = assign_value();
-		
-		
-		
-		
+		// The data that should be sent will depend on what stage of sending we are at
+		temp[1] = assign_value(bt_transfer_seq, fsrForces);
+		if (bt_transfer_seq > 6)
+		{
+			bt_transfer_seq = 0;
+		}
+		else
+		{
+			bt_transfer_seq += 1;
+		}
 		
 		nrf->sendData(PIPE_HEART_RATE_HEART_RATE_MEASUREMENT_TX, 2, (uint8_t *)&temp);
 		lastSent = millis();
@@ -286,92 +324,6 @@ void loop()
 		nrf->connect(0, 32);
 	}
 }
-
-
-
-
-
-
-
-
-
-
-/*
-void get_FSR_raw_values(int fsrRawData[])
-{
-	int fsrRawData0 = analogRead(fsrPin0);  
-	int fsrRawData1 = analogRead(fsrPin1);
-	int fsrRawData2 = analogRead(fsrPin2);
-	int fsrRawData3 = analogRead(fsrPin3);
-	
-	fsrRawData[0] = fsrRawData0;
-	fsrRawData[1] = fsrRawData1;
-	fsrRawData[2] = fsrRawData2;
-	fsrRawData[3] = fsrRawData3;
-}
-
-void get_FSR_voltages(int fsrVoltage[])
-{
-	int fsrVoltage0 = map(fsrRawData0, 0, 1023, 0, 5000);
-	int fsrVoltage1 = map(fsrRawData1, 0, 1023, 0, 5000);
-	int fsrVoltage2 = map(fsrRawData2, 0, 1023, 0, 5000);
-	int fsrVoltage3 = map(fsrRawData3, 0, 1023, 0, 5000);
-	
-	fsrVoltage[0] = fsrVoltage0;
-	fsrVoltage[1] = fsrVoltage1;
-	fsrVoltage[2] = fsrVoltage2;
-	fsrVoltage[3] = fsrVoltage3;
-}
-
-long get_FSR_force(int fsrVoltage)
-{
-	unsigned long fsrResistance;  // The voltage converted to resistance, can be very big so make "long"
-	unsigned long fsrConductance; 
-	long fsrForce;       // Finally, the resistance converted to force	
-	
-	if (fsrVoltage == 0)
-	{
-		fsrForce = 0;
-	}
-	
-	else
-	{
-		// The voltage = Vcc * R / (R + FSR) where R = 10K and Vcc = 5V
-		// so FSR = ((Vcc - V) * R) / V        yay math!
-		fsrResistance = 5000 - fsrVoltage;     // fsrVoltage is in millivolts so 5V = 5000mV
-		fsrResistance *= 10000;                // 10K resistor
-		fsrResistance /= fsrVoltage;
-		
-		fsrConductance = 1000000;           // we measure in micromhos so 
-		fsrConductance /= fsrResistance;
-		
-		// Use the two FSR guide graphs to approximate the force
-		if (fsrConductance <= 1000)
-		{
-			fsrForce = fsrConductance / 80;
-		}
-		else
-		{
-			fsrForce = fsrConductance - 1000;
-			fsrForce /= 30;
-		}
-	}
-	return fsrForce;
-}
-
-void process_forces(int fsrVoltage[])
-{
-	// This is held globally
-	// long fsrForces[4];
-	
-	fsrForces[0] = get_force(fsrVoltage[0]);
-	fsrForces[1] = get_force(fsrVoltage[1]);
-	fsrForces[2] = get_force(fsrVoltage[2]);
-	fsrForces[3] = get_force(fsrVoltage[3]);
-	
-}
-
-*/
 
 
 
