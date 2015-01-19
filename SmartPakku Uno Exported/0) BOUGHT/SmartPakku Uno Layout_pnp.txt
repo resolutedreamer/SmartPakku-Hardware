@@ -1,0 +1,25 @@
+*Pick And Place List
+*Company=
+*Author=
+*eMail=
+*
+*Project=SmartPakku Uno Layout
+*Date=20:21:32
+*CreatedBy=Fritzing 0.9.1b.11.19.8d2d5970658f0bed09c661c9ea9a515b5f40f44c
+*
+*
+*Coordinates in mm, always center of component
+*Origin 0/0=Lower left corner of PCB
+*Rotation in degree (0-360, math. pos.)
+*
+*No;Value;Package;X;Y;Rotation;Side;Name
+1;10k;THT;25.7404;-9.65806;180;Bottom;R4
+2;;;18.3437;-26.1681;0;Bottom;Part1
+3;10k;THT;15.5804;-14.7381;0;Bottom;R5
+4;;;19.3904;-32.5181;0;Bottom;RF1
+5;;THT;43.5204;-13.4681;180;Bottom;J1
+6;10k;THT;30.8204;-27.4381;180;Bottom;R3
+7;;THT;7.96036;-13.4681;0;Bottom;J5
+8;;THT;43.5204;-26.1681;0;Bottom;J3
+9;;THT;7.96036;-26.1681;0;Bottom;J4
+10;10k;THT;15.5804;-27.4381;0;Bottom;R2

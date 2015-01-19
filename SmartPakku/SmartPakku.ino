@@ -32,6 +32,8 @@ nRF8001 *nrf;
 float temperatureC;
 uint8_t pipeStatusReceived, dataSent;
 unsigned long lastSent;
+int bt_transfer_seq;
+
 
 // For LiPo Fuel Gauge
 MAX17043 batteryMonitor;
@@ -77,9 +79,13 @@ long measure_force(int fsrPin)
 void process_forces(long fsrForces[])
 {
 	fsrForces[0] = measure_force(fsrPin0);
+	Serial.println(fsrForces[0]);	
 	fsrForces[1] = measure_force(fsrPin1);
+	Serial.println(fsrForces[1]);
 	fsrForces[2] = measure_force(fsrPin2);
+	Serial.println(fsrForces[2]);
 	fsrForces[3] = measure_force(fsrPin3);
+	Serial.println(fsrForces[3]);
 }
 
 bool fsr_pressed(long fsrForce)
@@ -138,7 +144,7 @@ uint8_t assign_value(int bt_transfer_seq, long fsrForces[])
 	String sending_weight = "We send a weight in Newtons";
 			
 
-	Serial.print("We are in bt_transfer_seq stage: ");
+	Serial.print("bt_transfer_seq: ");
 	Serial.println(bt_transfer_seq);
 	switch(bt_transfer_seq)
 	{
@@ -149,7 +155,7 @@ uint8_t assign_value(int bt_transfer_seq, long fsrForces[])
 			return 's';
 		case 1:
 			a_state = get_pressed_state(fsrForces);
-			Serial.println("We send the current backpack state.");			
+			Serial.println("Send backpack state:");			
 			Serial.print(sending);
 			Serial.println(a_state);		
 			return a_state;
@@ -203,9 +209,15 @@ void setup()
 	temperatureC = 0.0;
 	pipeStatusReceived = 0;
 	lastSent = 0;
+	bt_transfer_seq = 0;
 
 	Wire.begin();
 	Serial.begin(115200);
+	while(!Serial)
+	{
+		// wait for serial port to connect. Needed for Leonardo only
+		;
+	}
 	//Serial.println("Hello");
 	
 	// LiPo Fuel Gauge Init Code
@@ -259,14 +271,12 @@ void setup()
 	Serial.print("Temperature: ");
 	Serial.println(temperatureC, 2);
 	}
-
 	nrf->connect(0, 32);
 }
 
 void loop()
 {
 	// what data to send
-	int bt_transfer_seq = 0;
 	long fsrForces[4];
 	Serial.println("Looping");
 
@@ -293,7 +303,7 @@ void loop()
 		
 		// The data that should be sent will depend on what stage of sending we are at
 		temp[1] = assign_value(bt_transfer_seq, fsrForces);
-		if (bt_transfer_seq > 6)
+		if (bt_transfer_seq == 5)
 		{
 			bt_transfer_seq = 0;
 		}
