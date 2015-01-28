@@ -1,0 +1,238 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Created with Fritzing (http://www.fritzing.org/) -->
+<netlist sketch="SmartPakku (Arduino Uno).fzz" date="Mon Jan 26 03:05:15 2015">
+ <net>
+  <connector id="connector87" name="5V">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+  <connector id="connector10" name="VIN">
+   <part label="RF1" id="854174000" title="nRF8001 Bluetooth LE Breakout"/>
+  </connector>
+  <connector id="connector1" name="pin 1">
+   <part label="J5" id="854221220" title="Basic Force Sensing Resistor (FSR)"/>
+  </connector>
+  <connector id="connector1" name="pin 1">
+   <part label="J4" id="57580" title="Basic Force Sensing Resistor (FSR)"/>
+  </connector>
+  <connector id="connector1" name="pin 1">
+   <part label="J1" id="57490" title="Basic Force Sensing Resistor (FSR)"/>
+  </connector>
+  <connector id="connector1" name="pin 1">
+   <part label="J3" id="57550" title="Basic Force Sensing Resistor (FSR)"/>
+  </connector>
+ </net>
+ <net>
+  <connector id="connector89" name="GND">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+  <connector id="connector57" name="GND">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+  <connector id="connector88" name="GND">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+  <connector id="connector1" name="Pin 1">
+   <part label="R4" id="57640" title="10kΩ Resistor"/>
+  </connector>
+  <connector id="connector9" name="GND">
+   <part label="RF1" id="854174000" title="nRF8001 Bluetooth LE Breakout"/>
+  </connector>
+  <connector id="connector1" name="Pin 1">
+   <part label="R3" id="57670" title="10kΩ Resistor"/>
+  </connector>
+  <connector id="connector1" name="Pin 1">
+   <part label="R2" id="57720" title="10kΩ Resistor"/>
+  </connector>
+  <connector id="connector1" name="Pin 1">
+   <part label="R5" id="854197970" title="10kΩ Resistor"/>
+  </connector>
+ </net>
+ <net>
+  <connector id="connector63" name="D2">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+  <connector id="connector5" name="RDY">
+   <part label="RF1" id="854174000" title="nRF8001 Bluetooth LE Breakout"/>
+  </connector>
+ </net>
+ <net>
+  <connector id="connector52" name="D9 PWM">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+  <connector id="connector7" name="RST">
+   <part label="RF1" id="854174000" title="nRF8001 Bluetooth LE Breakout"/>
+  </connector>
+ </net>
+ <net>
+  <connector id="connector53" name="D10 PWM/SS">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+  <connector id="connector4" name="REQ">
+   <part label="RF1" id="854174000" title="nRF8001 Bluetooth LE Breakout"/>
+  </connector>
+ </net>
+ <net>
+  <connector id="connector54" name="D11 PWM/MOSI">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+  <connector id="connector3" name="MOSI">
+   <part label="RF1" id="854174000" title="nRF8001 Bluetooth LE Breakout"/>
+  </connector>
+ </net>
+ <net>
+  <connector id="connector55" name="D12/MISO">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+  <connector id="connector2" name="MISO">
+   <part label="RF1" id="854174000" title="nRF8001 Bluetooth LE Breakout"/>
+  </connector>
+ </net>
+ <net>
+  <connector id="connector56" name="D13/SCK">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+  <connector id="connector1" name="SCK">
+   <part label="RF1" id="854174000" title="nRF8001 Bluetooth LE Breakout"/>
+  </connector>
+ </net>
+ <net>
+  <connector id="connector3" name="A3">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+  <connector id="connector0" name="pin 0">
+   <part label="J1" id="57490" title="Basic Force Sensing Resistor (FSR)"/>
+  </connector>
+  <connector id="connector0" name="Pin 0">
+   <part label="R4" id="57640" title="10kΩ Resistor"/>
+  </connector>
+ </net>
+ <net>
+  <connector id="connector1" name="A1">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+  <connector id="connector0" name="Pin 0">
+   <part label="R2" id="57720" title="10kΩ Resistor"/>
+  </connector>
+  <connector id="connector0" name="pin 0">
+   <part label="J4" id="57580" title="Basic Force Sensing Resistor (FSR)"/>
+  </connector>
+ </net>
+ <net>
+  <connector id="connector2" name="A2">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+  <connector id="connector0" name="Pin 0">
+   <part label="R3" id="57670" title="10kΩ Resistor"/>
+  </connector>
+  <connector id="connector0" name="pin 0">
+   <part label="J3" id="57550" title="Basic Force Sensing Resistor (FSR)"/>
+  </connector>
+ </net>
+ <net>
+  <connector id="connector0" name="A0">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+  <connector id="connector0" name="Pin 0">
+   <part label="R5" id="854197970" title="10kΩ Resistor"/>
+  </connector>
+  <connector id="connector0" name="pin 0">
+   <part label="J5" id="854221220" title="Basic Force Sensing Resistor (FSR)"/>
+  </connector>
+ </net>
+ <net>
+  <connector id="connector8" name="3Vo">
+   <part label="RF1" id="854174000" title="nRF8001 Bluetooth LE Breakout"/>
+  </connector>
+ </net>
+ <net>
+  <connector id="connector6" name="ACT">
+   <part label="RF1" id="854174000" title="nRF8001 Bluetooth LE Breakout"/>
+  </connector>
+ </net>
+ <net>
+  <connector id="connector5" name="A5/SCL">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+  <connector id="connector60" name="A5/SCL">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+ </net>
+ <net>
+  <connector id="connector68" name="D7">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+ </net>
+ <net>
+  <connector id="connector4" name="A4/SDA">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+  <connector id="connector59" name="A4/SDA">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+ </net>
+ <net>
+  <connector id="connector67" name="D6 PWM">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+ </net>
+ <net>
+  <connector id="connector66" name="D5 PWM">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+ </net>
+ <net>
+  <connector id="connector65" name="D4">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+ </net>
+ <net>
+  <connector id="connector64" name="D3 PWM">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+ </net>
+ <net>
+  <connector id="connector62" name="D1/TX">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+ </net>
+ <net>
+  <connector id="connector61" name="D0/RX">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+ </net>
+ <net>
+  <connector id="connector86" name="3V3">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+ </net>
+ <net>
+  <connector id="connector85" name="RESET">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+ </net>
+ <net>
+  <connector id="connector84" name="ioref">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+ </net>
+ <net>
+  <connector id="connector58" name="AREF">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+ </net>
+ <net>
+  <connector id="connector51" name="D8">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+ </net>
+ <net>
+  <connector id="connector91" name="N/C">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+ </net>
+ <net>
+  <connector id="connector90" name="VIN">
+   <part label="Part1" id="58200" title="Arduino Uno (Rev3)"/>
+  </connector>
+ </net>
+</netlist>

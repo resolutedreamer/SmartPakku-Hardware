@@ -1,18 +1,21 @@
 // Set Serial Monitor to 115200
 // Currently this will output large amounts of debugging data
 
-#define NRF_DEBUG 1
 #include <SPI.h>
 #include <nRF8001.h>
 
 #include "services.h"
-
 // For LiPo Fuel Gauge
 #include "MAX17043.h"
 #include "Wire.h"
 
 hal_aci_data_t setup_msgs[NB_SETUP_MESSAGES] = SETUP_MESSAGES_CONTENT;
 
+
+#if defined (__AVR_ATmega328P__)
+
+#define NRF_DEBUG 1
+  
 // change nRF8001 reset pin to -1 if it's not connected
 // Redbear BLE Shield users: to my knowledge reset pin is not connected so use -1!
 // NOTE: if you choose -1, youll need to manually reset your device after powerup!!
@@ -26,6 +29,36 @@ hal_aci_data_t setup_msgs[NB_SETUP_MESSAGES] = SETUP_MESSAGES_CONTENT;
 #define fsrPin1 1
 #define fsrPin2 2
 #define fsrPin3 3
+
+#endif /* ARDUINO_UNO */
+
+
+#elif defined (__AVR_ATmega32U4__)
+
+#define NRF_DEBUG 1
+  
+// change nRF8001 reset pin to -1 if it's not connected
+// Redbear BLE Shield users: to my knowledge reset pin is not connected so use -1!
+// NOTE: if you choose -1, youll need to manually reset your device after powerup!!
+#define RESET_PIN 9
+#define REQN_PIN 10
+#define RDYN_PIN 2
+
+// For FSR
+// each of a0 - a3 have a FSR and 10K pulldown resistor attached 
+#define fsrPin0 0
+#define fsrPin1 1
+#define fsrPin2 2
+#define fsrPin3 3
+
+#endif /* ADAFRUIT_FLORA */
+
+
+
+
+
+
+
 
 nRF8001 *nrf;
 
@@ -222,7 +255,7 @@ void setup()
 	
 	// LiPo Fuel Gauge Init Code
 	
-	//Serial.println("MAX17043 Example: reading voltage and SoC");
+	Serial.println("MAX17043 Example: reading voltage and SoC");
 	Serial.println();
 
 	batteryMonitor.reset();

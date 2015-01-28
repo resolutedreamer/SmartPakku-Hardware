@@ -1,0 +1,25 @@
+*Pick And Place List
+*Company=
+*Author=
+*eMail=
+*
+*Project=SmartPakku (Arduino Uno)
+*Date=03:06:47
+*CreatedBy=Fritzing 0.9.1b.11.19.8d2d5970658f0bed09c661c9ea9a515b5f40f44c
+*
+*
+*Coordinates in mm, always center of component
+*Origin 0/0=Lower left corner of PCB
+*Rotation in degree (0-360, math. pos.)
+*
+*No;Value;Package;X;Y;Rotation;Side;Name
+1;10k;THT;17.0199;-15.0468;0;Bottom;R5
+2;;THT;42.4199;-13.7768;180;Bottom;J1
+3;;THT;6.85987;-26.4768;0;Bottom;J4
+4;;THT;42.4199;-26.4768;0;Bottom;J3
+5;;;18.2899;-32.8268;0;Bottom;RF1
+6;10k;THT;17.0199;-27.7468;0;Bottom;R2
+7;;THT;6.85987;-13.7768;0;Bottom;J5
+8;;;18.2584;-26.4768;0;Bottom;Part1
+9;10k;THT;29.7199;-27.7468;180;Bottom;R3
+10;10k;THT;24.6399;-9.96684;180;Bottom;R4

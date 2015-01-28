@@ -1,0 +1,9 @@
+SmartPakku (Arduino Uno)
+R5 1 0 10k
+R2 10 0 10k
+R3 11 0 10k
+R4 3 0 10k
+
+.TRAN 1ms 100ms
+* .AC DEC 100 100 1MEG
+.END
