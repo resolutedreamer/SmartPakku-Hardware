@@ -1,6 +1,7 @@
 // Set Serial Monitor to 115200
 // Currently this will output large amounts of debugging data
 
+#define NRF_DEBUG 1
 #include <SPI.h>
 #include <nRF8001.h>
 
@@ -11,11 +12,7 @@
 
 hal_aci_data_t setup_msgs[NB_SETUP_MESSAGES] = SETUP_MESSAGES_CONTENT;
 
-
-#if defined (__AVR_ATmega328P__)
-
-#define NRF_DEBUG 1
-  
+#if defined (__AVR_ATmega328P__) /* ARDUINO_UNO */
 // change nRF8001 reset pin to -1 if it's not connected
 // Redbear BLE Shield users: to my knowledge reset pin is not connected so use -1!
 // NOTE: if you choose -1, youll need to manually reset your device after powerup!!
@@ -30,43 +27,33 @@ hal_aci_data_t setup_msgs[NB_SETUP_MESSAGES] = SETUP_MESSAGES_CONTENT;
 #define fsrPin2 2
 #define fsrPin3 3
 
-#endif /* ARDUINO_UNO */
-
-
-#elif defined (__AVR_ATmega32U4__)
-
-#define NRF_DEBUG 1
-  
+#elif defined (__AVR_ATmega32U4__) /* ADAFRUIT_FLORA */
 // change nRF8001 reset pin to -1 if it's not connected
 // Redbear BLE Shield users: to my knowledge reset pin is not connected so use -1!
 // NOTE: if you choose -1, youll need to manually reset your device after powerup!!
-#define RESET_PIN 9
-#define REQN_PIN 10
-#define RDYN_PIN 2
+#define RESET_PIN -1
+#define REQN_PIN 0
+#define RDYN_PIN 1
 
 // For FSR
 // each of a0 - a3 have a FSR and 10K pulldown resistor attached 
-#define fsrPin0 0
-#define fsrPin1 1
-#define fsrPin2 2
-#define fsrPin3 3
+#define fsrPin0 A9
+#define fsrPin1 A10
+#define fsrPin2 A7
+#define fsrPin3 A11
 
-#endif /* ADAFRUIT_FLORA */
-
-
-
-
-
-
-
+#endif
 
 nRF8001 *nrf;
 
 float temperatureC;
 uint8_t pipeStatusReceived, dataSent;
 unsigned long lastSent;
-int bt_transfer_seq;
+unsigned int bt_transfer_seq;
+unsigned int loopcount;
 
+// what data to send
+long fsrForces[4];
 
 // For LiPo Fuel Gauge
 MAX17043 batteryMonitor;
@@ -174,7 +161,7 @@ uint8_t assign_value(int bt_transfer_seq, long fsrForces[])
 	uint8_t a_state;
 	uint8_t a_force;
 	String sending = "Sending: ";
-	String sending_weight = "We send a weight in Newtons";
+	String sending_weight = "Send a weight in Newtons";
 			
 
 	Serial.print("bt_transfer_seq: ");
@@ -243,6 +230,9 @@ void setup()
 	pipeStatusReceived = 0;
 	lastSent = 0;
 	bt_transfer_seq = 0;
+        loopcount = 0;
+
+	//ble_set_name("SmartPakku");
 
 	Wire.begin();
 	Serial.begin(115200);
@@ -255,7 +245,7 @@ void setup()
 	
 	// LiPo Fuel Gauge Init Code
 	
-	Serial.println("MAX17043 Example: reading voltage and SoC");
+	Serial.println("LiPo FuelGauge");
 	Serial.println();
 
 	batteryMonitor.reset();
@@ -300,21 +290,26 @@ void setup()
 	nrf->getTemperature();
 	nrf->poll();
 
-	if (temperatureC > 0.0) {
-	Serial.print("Temperature: ");
-	Serial.println(temperatureC, 2);
+	if (temperatureC > 0.0)
+	{
+		Serial.print("Temp: ");
+		Serial.println(temperatureC, 2);
 	}
 	nrf->connect(0, 32);
 }
 
 void loop()
 {
-	// what data to send
-	long fsrForces[4];
-	Serial.println("Looping");
+	
 
 	// Polling will block - times out after 2 seconds
 	nrf->poll(2000);
+
+	Serial.print("Loop ");
+        Serial.println(loopcount);
+        loopcount++;
+
+
 
 	bool a = nrf->isPipeOpen(PIPE_HEART_RATE_HEART_RATE_MEASUREMENT_TX);
 	bool b = (millis() - lastSent) > 1000;
@@ -329,7 +324,7 @@ void loop()
 	// If heart rate pipe is open
 	if ( a && b && c)
 	{
-		Serial.println("Preparing to send");
+		Serial.println("Pipe Open");
 		uint8_t temp[2];
 		temp[0] = 0;
 		//temp[1] = round(temperatureC);
