@@ -46,7 +46,6 @@ hal_aci_data_t setup_msgs[NB_SETUP_MESSAGES] = SETUP_MESSAGES_CONTENT;
 
 nRF8001 *nrf;
 
-float temperatureC;
 uint8_t pipeStatusReceived, dataSent;
 unsigned long lastSent;
 unsigned int bt_transfer_seq;
@@ -57,6 +56,8 @@ long fsrForces[4];
 
 // For LiPo Fuel Gauge
 MAX17043 batteryMonitor;
+
+
 
 long measure_force(int fsrPin)
 {
@@ -96,6 +97,14 @@ long measure_force(int fsrPin)
 	return fsrForce;
 }
 
+/*
+long measure_force(int fsrPin)
+{
+	int fsrReading;     // the analog reading from the FSR resistor divider
+	fsrReading = analogRead(fsrPin);
+	return fsrReading;
+}*/
+
 void process_forces(long fsrForces[])
 {
 	fsrForces[0] = measure_force(fsrPin0);
@@ -120,7 +129,7 @@ bool fsr_pressed(long fsrForce)
 	}
 }
 
-uint8_t get_pressed_state(long fsrForces[])
+uint8_t get_pressed_state()
 {
 	uint8_t state = 0;
 	bool fsrPressed0, fsrPressed1, fsrPressed2, fsrPressed3;
@@ -133,30 +142,15 @@ uint8_t get_pressed_state(long fsrForces[])
 	fsrPressed2 = fsr_pressed(fsrForces[2]);
 	fsrPressed3 = fsr_pressed(fsrForces[3]);
 	
-	if (fsrPressed0)
-	{
-		state = state | 1;
-		
-	}
-	if (fsrPressed1)
-	{
-		state = state | 2;
-		
-	}
-	if (fsrPressed2)
-	{
-		state = state | 4;
-		
-	}
-	if (fsrPressed3)
-	{
-		state = state | 8;
-		
-	}
+        state = state | (fsrPressed0 << 0);
+        state = state | (fsrPressed1 << 1);
+        state = state | (fsrPressed2 << 2);
+        state = state | (fsrPressed3 << 3);
+        
 	return state;
 }
 
-uint8_t assign_value(int bt_transfer_seq, long fsrForces[])
+uint8_t assign_value(int bt_transfer_seq)
 {
 	uint8_t a_state;
 	uint8_t a_force;
@@ -169,12 +163,12 @@ uint8_t assign_value(int bt_transfer_seq, long fsrForces[])
 	switch(bt_transfer_seq)
 	{
 		case 0:
-			Serial.println("Send an 's'");			
+			Serial.println("Send an 's'");
 			Serial.print(sending);
 			Serial.println("s");		
 			return 's';
 		case 1:
-			a_state = get_pressed_state(fsrForces);
+			a_state = get_pressed_state();
 			Serial.println("Send backpack state:");			
 			Serial.print(sending);
 			Serial.println(a_state);		
@@ -209,14 +203,6 @@ uint8_t assign_value(int bt_transfer_seq, long fsrForces[])
 	}
 }
 
-
-// This function is called when nRF8001 responds with the temperature
-void temperatureHandler(float tempC)
-{
-	//Serial.println("received temperature");
-	temperatureC = tempC;
-}
-
 // Generic event handler, here it's just for debugging all received events
 void eventHandler(nRFEvent *event)
 {
@@ -226,7 +212,6 @@ void eventHandler(nRFEvent *event)
 
 void setup()
 {
-	temperatureC = 0.0;
 	pipeStatusReceived = 0;
 	lastSent = 0;
 	bt_transfer_seq = 0;
@@ -270,7 +255,6 @@ void setup()
 
 	// Register event handles
 	nrf->setEventHandler(&eventHandler);
-	nrf->setTemperatureHandler(&temperatureHandler);
 	if ((nrf->setup(setup_msgs, NB_SETUP_MESSAGES)) == cmdSuccess)
 	{
 		Serial.println("SUCCESS");
@@ -287,21 +271,12 @@ void setup()
 	// the device is not ready for these commands.
 	nrf->getDeviceAddress();
 	nrf->poll();
-	nrf->getTemperature();
-	nrf->poll();
 
-	if (temperatureC > 0.0)
-	{
-		Serial.print("Temp: ");
-		Serial.println(temperatureC, 2);
-	}
 	nrf->connect(0, 32);
 }
 
 void loop()
 {
-	
-
 	// Polling will block - times out after 2 seconds
 	nrf->poll(2000);
 
@@ -309,11 +284,9 @@ void loop()
         Serial.println(loopcount);
         loopcount++;
 
-
-
 	bool a = nrf->isPipeOpen(PIPE_HEART_RATE_HEART_RATE_MEASUREMENT_TX);
 	bool b = (millis() - lastSent) > 1000;
-	bool c = temperatureC > 0.0 && nrf->creditsAvailable();
+	bool c = nrf->creditsAvailable();
 	
 	Serial.println(a);
 	Serial.println(b);
@@ -330,7 +303,7 @@ void loop()
 		//temp[1] = round(temperatureC);
 		
 		// The data that should be sent will depend on what stage of sending we are at
-		temp[1] = assign_value(bt_transfer_seq, fsrForces);
+		temp[1] = assign_value(bt_transfer_seq);
 		if (bt_transfer_seq == 5)
 		{
 			bt_transfer_seq = 0;
@@ -351,9 +324,6 @@ void loop()
 		{
 			nrf->sendData(PIPE_BATTERY_BATTERY_LEVEL_TX, 1, &bat);
 		}
-
-		// get new temperature
-		nrf->getTemperature();
 	}
 	else if (nrf->getConnectionStatus() == Disconnected)
 	{
